@@ -5,13 +5,12 @@ CREATE TABLE user (
   password_hash VARCHAR(255) NOT NULL,
   registered_at TIMESTAMP DEFAULT NOW(),
   last_logged_in TIMESTAMP,
-  visual_impairment BOOLEAN DEFAULT false,
-  hearing_impairment BOOLEAN DEFAULT false,
+  -- visual_impairment BOOLEAN DEFAULT false,
+  -- hearing_impairment BOOLEAN DEFAULT false,
   first_name VARCHAR(255) NULL,
   last_name VARCHAR(255) NULL,
   about_me TEXT,
 );
-
 
 CREATE TABLE device (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -26,7 +25,7 @@ CREATE TABLE device (
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now(),
   owner_id UUID REFERENCES users(id),
-  about_device TEXT,
+  about TEXT,
 );
 
 CREATE TABLE technician (
@@ -37,62 +36,58 @@ CREATE TABLE technician (
   registered_at TIMESTAMP DEFAULT NOW(),
   schedule_last_updated_at TIMESTAMP DEFAULT NOW()
   last_logged_in TIMESTAMP,
-  hearing_impairment BOOLEAN DEFAULT false,
-  visual_impairment BOOLEAN DEFAULT false,
-  about_me TEXT
+  -- hearing_impairment BOOLEAN DEFAULT false,
+  -- visual_impairment BOOLEAN DEFAULT false,
+  about TEXT
 );
 
 CREATE TABLE space (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(255) NOT NULL,
-  about_space TEXT,
+  about TEXT,
 );
 
 CREATE TABLE space_group (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(255) NOT NULL,
-  about_group TEXT
+  about TEXT
 );
 
 CREATE TABLE user_space_access (
-  user_id UUID REFERENCES users(id),
-  space_id UUID REFERENCES spaces(id),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, space_id)
 );
 
 CREATE TABLE user_device_access (
-  user_id UUID REFERENCES users(id),
-  device_id UUID REFERENCES devices(id),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, device_id)
 );
 
 CREATE TABLE space_device_access (
-  space_id UUID REFERENCES spaces(id),
-  device_id UUID REFERENCES devices(id),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
   PRIMARY KEY (space_id, device_id)
 );
 
-CREATE TABLE technician_space_access (
-  technician_id UUID REFERENCES technicians(id),
-  space_id UUID REFERENCES spaces(id),
-  PRIMARY KEY (technician_id, space_id)
-);
 
 CREATE TABLE technician_device_access (
-  technician_id UUID REFERENCES technicians(id),
-  device_id UUID REFERENCES devices(id),
+  technician_id UUID REFERENCES technicians(id) ON DELETE CASCADE,
+  device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
   PRIMARY KEY (technician_id, device_id)
 );
 
 
 CREATE TABLE user_group_access (
-  user_id UUID REFERENCES users(id),
-  group_id UUID REFERENCES space_group(id),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  group_id UUID REFERENCES space_group(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, group_id)
 );
 
 CREATE TABLE space_space_group_mapping (
-  group_id UUID REFERENCES space_group(id), -- Set rules, like if the last space from the groupp deleted on delete of the last one: cascade the deletion to the space_group
-  space_id UUID REFERENCES spaces(id),
+  space_group_id UUID REFERENCES space_group(id) ON DELETE CASCADE, -- automatically delete any associated rows in the space_space_group_mapping table when a space_group row is deleted.
+  space_id UUID REFERENCES space(id) ON DELETE CASCADE, -- automatically delete any associated rows in the space_space_group_mapping table when a space row is deleted.
   PRIMARY KEY (group_id, space_id)
 );
+
