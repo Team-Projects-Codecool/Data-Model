@@ -91,3 +91,13 @@ CREATE TABLE space_space_group_mapping (
   PRIMARY KEY (group_id, space_id)
 );
 
+-- This function automatically deletes a space group if it has got empty (no more mappings with any group)
+CREATE OR REPLACE FUNCTION delete_space_group_if_no_mappings()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM space_space_group_mapping WHERE space_group_id = OLD.space_group_id) THEN
+        DELETE FROM space_group WHERE id = OLD.space_group_id;
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
