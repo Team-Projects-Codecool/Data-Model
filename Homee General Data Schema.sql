@@ -24,7 +24,7 @@ CREATE TABLE device (
   purchase_price NUMERIC(10, 2),
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now(),
-  owner_id UUID REFERENCES users(id),
+  owner_id UUID REFERENCES user(id),
   about TEXT,
 );
 
@@ -125,33 +125,33 @@ CREATE TABLE space_group (
 );
 
 CREATE TABLE user_space_access (
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES user(id) ON DELETE CASCADE,
+  space_id UUID REFERENCES space(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, space_id)
 );
 
 CREATE TABLE user_device_access (
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES user(id) ON DELETE CASCADE,
+  device_id UUID REFERENCES device(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, device_id)
 );
 
 CREATE TABLE space_device_access (
-  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
-  device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
+  space_id UUID REFERENCES space(id) ON DELETE CASCADE,
+  device_id UUID REFERENCES device(id) ON DELETE CASCADE,
   PRIMARY KEY (space_id, device_id)
 );
 
 
 CREATE TABLE technician_device_access (
-  technician_id UUID REFERENCES technicians(id) ON DELETE CASCADE,
-  device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
+  technician_id UUID REFERENCES technician(id) ON DELETE CASCADE,
+  device_id UUID REFERENCES device(id) ON DELETE CASCADE,
   PRIMARY KEY (technician_id, device_id)
 );
 
 
 CREATE TABLE user_group_access (
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES user(id) ON DELETE CASCADE,
   group_id UUID REFERENCES space_group(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, group_id)
 );
@@ -159,7 +159,7 @@ CREATE TABLE user_group_access (
 CREATE TABLE space_space_group_mapping (
   space_group_id UUID REFERENCES space_group(id) ON DELETE CASCADE, -- automatically delete any associated rows in the space_space_group_mapping table when a space_group row is deleted.
   space_id UUID REFERENCES space(id) ON DELETE CASCADE, -- automatically delete any associated rows in the space_space_group_mapping table when a space row is deleted.
-  PRIMARY KEY (group_id, space_id)
+  PRIMARY KEY (space_group_id, space_id)
 );
 
 -- This function automatically deletes a space group if it has got empty (no more mappings with any group)
